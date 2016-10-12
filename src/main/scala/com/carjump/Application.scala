@@ -20,7 +20,7 @@ object Application extends App {
   val index = new IndexEndpoint(fetcher, akka.util.Timeout(cfg.getDuration("cache.time-out")))
   val cache = new CacheEndpoint(fetcher, akka.util.Timeout(cfg.getDuration("cache.time-out")))
 
-  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.router ~ index.router), "localhost", httpPort)
+  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.router ~ index.router), "127.0.0.1", httpPort)
     .onComplete {
       case Success(binding) ⇒
         val greeting = new StringBuilder()
