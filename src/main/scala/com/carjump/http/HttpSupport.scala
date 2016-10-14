@@ -12,6 +12,8 @@ trait HttpSupport extends Directives {
   protected val timeHeader = "Last_Updated_Time"
   protected val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
+  def route: Route
+
   def httpPath: String
 
   def withUri: Directive1[String] = extract(_.request.uri.toString)

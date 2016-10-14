@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.carjump.http.{ CacheEndpoint, IndexEndpoint }
+import com.carjump.http.{ MetricsEndpoint, CacheEndpoint, IndexEndpoint }
 
 import scala.util.{ Failure, Success }
 
@@ -17,10 +17,11 @@ object Application extends App {
 
   val fetcher = system.actorOf(CacheGuardian.props, "guardian")
 
-  val index = new IndexEndpoint(fetcher, akka.util.Timeout(cfg.getDuration("cache.time-out")))
-  val cache = new CacheEndpoint(fetcher, akka.util.Timeout(cfg.getDuration("cache.time-out")))
+  val metrics = new MetricsEndpoint()
+  val index = new IndexEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("cache.time-out")))
+  val cache = new CacheEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("cache.time-out")))
 
-  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.router ~ index.router), "127.0.0.1", httpPort)
+  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.route ~ index.route ~ metrics.route), "127.0.0.1", httpPort)
     .onComplete {
       case Success(binding) ⇒
         val greeting = new StringBuilder()

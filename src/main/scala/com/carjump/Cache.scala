@@ -128,7 +128,7 @@ class Cache(override val url: String, override val pref: String, override val pu
       throw CacheException("Cache error",
         new Exception("Http client flow has been completed unexpectedly"))
 
-    //case akka.actor.Status.Failure(ex) ⇒throw FetcherException(message = "Fetcher error", cause = ex)
+    //case akka.actor.Status.Failure(ex) ⇒ throw CacheException(message = "Fetcher error", cause = ex)
   }
 
   override def receive = updateState(Seq[Compressed[String]](),

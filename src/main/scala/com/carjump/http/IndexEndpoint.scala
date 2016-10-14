@@ -1,20 +1,21 @@
 package com.carjump.http
 
-import akka.actor.{ ActorSystem, ActorRef }
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ HttpHeader, HttpResponse }
 import akka.http.scaladsl.server._
 import cats.data.Xor
-import com.carjump.Cache.{ FindInIndex, CacheItem }
 import com.carjump.AskSupport
+import com.carjump.Cache.{ CacheItem, FindInIndex }
 
 import scala.collection.immutable
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{ ExecutionContext, Future }
 
-class IndexEndpoint(fetcher: ActorRef, override implicit val askTimeout: akka.util.Timeout)(implicit system: ActorSystem, ec: ExecutionContext) extends AskSupport with HttpSupport {
-  override val httpPath = "index"
+class IndexEndpoint(fetcher: ActorRef,
+                    override implicit val askTimeout: akka.util.Timeout,
+                    override val httpPath: String = "index")(implicit system: ActorSystem, ec: ExecutionContext) extends AskSupport with HttpSupport {
 
-  val router = indexRoute
+  override val route = indexRoute
 
   private def indexRoute(): Route =
     (get & path(httpPath / Segment)) { id ⇒

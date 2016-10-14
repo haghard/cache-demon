@@ -46,6 +46,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"   %%  "akka-stream"             %   Akka,
   "com.typesafe.akka"   %%  "akka-http-experimental"  %   Akka,
   "com.typesafe.akka"   %%  "akka-slf4j"              %   Akka,
+  "com.twitter"         %%  "util-stats"              %   "6.38.0",
+  "com.twitter"         %%  "util-jvm"                %   "6.38.0",
   "com.lihaoyi"         %%  "pprint"                  %   "0.4.1",
   "org.typelevel"       %%  "cats-core"               %   "0.7.2",
   "ch.qos.logback"      %   "logback-classic"         %   "1.1.2"

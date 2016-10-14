@@ -11,10 +11,11 @@ import com.carjump.AskSupport
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.collection.immutable
 
-class CacheEndpoint(fetcher: ActorRef, override implicit val askTimeout: akka.util.Timeout)(implicit system: ActorSystem, ec: ExecutionContext) extends AskSupport with HttpSupport {
-  override val httpPath = "cache"
+class CacheEndpoint(fetcher: ActorRef,
+                    override val httpPath: String = "cache",
+                    override implicit val askTimeout: akka.util.Timeout)(implicit system: ActorSystem, ec: ExecutionContext) extends AskSupport with HttpSupport {
 
-  val router = cacheRoute
+  override val route = cacheRoute
 
   private def cacheRoute(): Route =
     (get & path(httpPath / Segment)) { id ⇒

@@ -23,7 +23,8 @@ class CacheGuardian extends Actor with ActorLogging {
 
   val decider: PartialFunction[Throwable, Directive] = {
     case ex: Throwable ⇒
-      log.error(ex, "Cache has failed unexpectedly. We will try to recreate it later")
+      log.error(ex, "Cache has failed unexpectedly.")
+      //context.system.terminate().onComplete(_ ⇒ System.exit(-1))(context.system.dispatcher)
       akka.actor.SupervisorStrategy.Stop
   }
 
