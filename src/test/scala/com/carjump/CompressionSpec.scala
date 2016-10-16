@@ -17,6 +17,8 @@ package com.carjump
 import com.carjump.compression.{ Compressor, Decompressor }
 import org.scalatest.{ MustMatchers, WordSpecLike }
 
+import scala.collection.IndexedSeqLike
+
 //akka.testkit.TestKit(ActorSystem("carjump"))
 class CompressionSpec extends WordSpecLike with MustMatchers {
 

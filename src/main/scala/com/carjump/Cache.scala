@@ -5,6 +5,8 @@ import java.time._
 import akka.http.scaladsl.Http
 import com.carjump.compression._
 import com.carjump.http.{ CacheResponseBody, ReqParams }
+import com.rklaehn.radixtree.RadixTree
+import scala.collection.immutable.SortedMap
 import scala.concurrent.duration._
 import scala.concurrent.duration.FiniteDuration
 import akka.actor.{ ActorLogging, Props, Actor }
@@ -40,7 +42,8 @@ object Cache {
     tokenize(x).mkString
   }
 
-  def props(url: String, pref: String, pullInterval: FiniteDuration) = Props(new Cache(url, pref, pullInterval)).withDispatcher(Application.Dispatcher)
+  def props(url: String, pref: String, pullInterval: FiniteDuration) =
+    Props(new Cache(url, pref, pullInterval)).withDispatcher(Application.Dispatcher)
 }
 
 class Cache(override val url: String, override val pref: String, override val pullInterval: FiniteDuration) extends Actor
@@ -69,18 +72,18 @@ class Cache(override val url: String, override val pref: String, override val pu
 
   private def outOffRange(index: Int, maxIndex: Int): Boolean = index < 0 || index > maxIndex
 
-  def updateState(state: Seq[Compressed[String]], index: Vector[IndexEntry[String]],
-                  maxIndex: Int, mbSize: Float,
-                  lastUpdate: ZonedDateTime): Receive = {
+  def updateState(state: Seq[Compressed[String]],
+                  inMemoryIndex: Vector[IndexEntry[String]],
+                  maxIndex: Int, mbSize: Float, lastUpdate: ZonedDateTime): Receive = {
     case FindInIndex(url, index0) ⇒
       if (!outOffRange(index0, maxIndex)) {
         val start = System.nanoTime
-
         //binary search is used since we have Vector
         import scala.collection.Searching._
-        val searchResult: SearchResult = index.search(IndexEntry(index0, ""))
 
-        val item = index.applyOrElse(searchResult.insertionPoint, { x: Int ⇒ notFoundEntry })
+        val searchResult: SearchResult = inMemoryIndex.search(IndexEntry(index0, ""))
+
+        val item = inMemoryIndex.applyOrElse(searchResult.insertionPoint, { x: Int ⇒ notFoundEntry })
         if (item == notFoundEntry)
           sender() ! CacheItem[String](Option(s"Something went wrong for $index0. The index range:[0..$maxIndex]"), lastUpdated = lastUpdate)
         else
@@ -137,6 +140,6 @@ class Cache(override val url: String, override val pref: String, override val pu
 
   val mbDivider = (1024 * 1024).toFloat
 
-  override def receive = updateState(Seq[Compressed[String]](),
-    Vector[IndexEntry[String]](), 0, 0f, ZonedDateTime.now)
+  override def receive = updateState(Seq[Compressed[String]](), Vector[IndexEntry[String]](),
+    0, 0f, ZonedDateTime.now)
 }

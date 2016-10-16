@@ -28,7 +28,12 @@ object Application extends App {
   val index = new IndexEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
   val cache = new CacheEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
 
-  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.route ~ index.route ~ metrics.route), "0.0.0.0", httpPort)
+  val wordsCache = system.actorOf(EnglishWordsCache.props(cfg.getString("words.url")))
+
+  val words = new EnglishWordsEndpoint(wordsCache, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
+
+  Http().bindAndHandle(akka.http.scaladsl.server.RouteResult.route2HandlerFlow(cache.route ~ index.route ~ metrics.route ~ words.route),
+    "0.0.0.0", httpPort)
     .onComplete {
       case Success(binding) ⇒
         val greeting = new StringBuilder()
