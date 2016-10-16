@@ -47,10 +47,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"   %%  "akka-http-experimental"  %   Akka,
   "com.typesafe.akka"   %%  "akka-slf4j"              %   Akka,
   "com.twitter"         %%  "util-jvm"                %   "6.38.0",
-  //"com.twitter"       %%  "util-stats"              %   "6.38.0",
-  //"com.twitter"       %%  "util-core"               %   "6.38.0",
-  //"org.hdrhistogram"  %   "HdrHistogram"            %   "2.1.9",
   "com.lihaoyi"         %%  "pprint"                  %   "0.4.1",
+  "org.openjdk.jol"     %   "jol-core"                %   "0.6",
   "org.typelevel"       %%  "cats-core"               %   "0.7.2",
   "ch.qos.logback"      %   "logback-classic"         %   "1.1.2"
 )

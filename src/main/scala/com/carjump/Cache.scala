@@ -69,7 +69,9 @@ class Cache(override val url: String, override val pref: String, override val pu
 
   private def outOffRange(index: Int, maxIndex: Int): Boolean = index < 0 || index > maxIndex
 
-  def updateState(state: Seq[Compressed[String]], index: Vector[IndexEntry[String]], maxIndex: Int, lastUpdate: ZonedDateTime): Receive = {
+  def updateState(state: Seq[Compressed[String]], index: Vector[IndexEntry[String]],
+                  maxIndex: Int, mbSize: Float,
+                  lastUpdate: ZonedDateTime): Receive = {
     case FindInIndex(url, index0) ⇒
       if (!outOffRange(index0, maxIndex)) {
         val start = System.nanoTime
@@ -103,6 +105,8 @@ class Cache(override val url: String, override val pref: String, override val pu
 
     case rawCache: Seq[String] @unchecked ⇒
       val cache = Compressor(rawCache)
+      val size = org.openjdk.jol.info.GraphLayout.parseInstance(rawCache).totalSize().toFloat
+
       val index = cache.foldLeft((Vector[IndexEntry[String]](), -1)) { (acc, c) ⇒
         c match {
           case Single(ch) ⇒
@@ -117,9 +121,12 @@ class Cache(override val url: String, override val pref: String, override val pu
         }
       }
 
-      log.info("Cache has been updated. New size {} \n {} \n {}", rawCache.size, pretty(cache), pretty(index._1))
+      val mbSize = size / mbDivider
 
-      (context become updateState(cache, index._1, rawCache.size - 1, ZonedDateTime.now))
+      log.info("Cache has been updated. The number of elements {} \nHeap size: {} mb \n{} \n{}",
+        rawCache.size, mbSize, pretty(cache), pretty(index._1))
+
+      (context become updateState(cache, index._1, rawCache.size - 1, mbSize, ZonedDateTime.now))
 
     case m: String if (m == onCompleteMessage) ⇒
       throw CacheException("Cache error",
@@ -128,6 +135,8 @@ class Cache(override val url: String, override val pref: String, override val pu
     //case akka.actor.Status.Failure(ex) ⇒ throw CacheException(message = "Fetcher error", cause = ex)
   }
 
+  val mbDivider = (1024 * 1024).toFloat
+
   override def receive = updateState(Seq[Compressed[String]](),
-    Vector[IndexEntry[String]](), 0, ZonedDateTime.now)
+    Vector[IndexEntry[String]](), 0, 0f, ZonedDateTime.now)
 }
