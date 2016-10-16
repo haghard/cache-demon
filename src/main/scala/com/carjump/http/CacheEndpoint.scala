@@ -20,14 +20,14 @@ class CacheEndpoint(fetcher: ActorRef,
   private def cacheRoute(): Route =
     (get & path(httpPath / Segment)) { id ⇒
       withUri { url ⇒
-        system.log.info(s"HTTP GET: [$url]")
-        get(complete(query(id)))
+        system.log.info(s"HTTP GET [$url]")
+        get(complete(query(id, url)))
       }
     }
 
-  private def query(id: String): Future[HttpResponse] = {
+  private def query(id: String, url: String): Future[HttpResponse] = {
     Xor.catchNonFatal(id.toInt).fold(ex ⇒ Future.successful(internalError(s"Index should be a number. ${ex.getMessage}")), { idInt ⇒
-      queryCache[CacheItem[String]](FindInDecompressed(idInt), fetcher).map {
+      queryCache[CacheItem[String]](FindInDecompressed(url, idInt), fetcher).map {
         case Xor.Right(res) ⇒
           val headers = immutable.Seq[HttpHeader](RawHeader(latencyHeader, res.latency.toString), RawHeader(timeHeader, formatter.format(res.lastUpdated)))
           success(res.value.get, headers)

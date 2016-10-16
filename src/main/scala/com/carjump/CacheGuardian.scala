@@ -8,7 +8,7 @@ import akka.actor.SupervisorStrategy.Directive
 import akka.pattern.{ Backoff, BackoffSupervisor }
 
 object CacheGuardian {
-  def props = Props[CacheGuardian].withDispatcher(Cache.DispatcherName)
+  def props = Props[CacheGuardian].withDispatcher(Application.Dispatcher)
 }
 
 class CacheGuardian extends Actor with ActorLogging {

@@ -20,14 +20,14 @@ class IndexEndpoint(fetcher: ActorRef,
   private def indexRoute(): Route =
     (get & path(httpPath / Segment)) { id ⇒
       withUri { url ⇒
-        system.log.info(s"HTTP GET: [$url]")
-        get(complete(query(id)))
+        system.log.info(s"HTTP GET: $url")
+        get(complete(query(id, url)))
       }
     }
 
-  private def query(id: String): Future[HttpResponse] = {
+  private def query(id: String, url: String): Future[HttpResponse] = {
     Xor.catchNonFatal(id.toInt).fold(ex ⇒ Future.successful(internalError(s"Index should be a number. ${ex.getMessage}")), { idInt ⇒
-      queryCache[CacheItem[String]](FindInIndex(idInt), fetcher).map {
+      queryCache[CacheItem[String]](FindInIndex(url, idInt), fetcher).map {
         case Xor.Right(res) ⇒
           val headers = immutable.Seq[HttpHeader](RawHeader(latencyHeader, res.latency.toString),
             RawHeader(timeHeader, formatter.format(res.lastUpdated)))

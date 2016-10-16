@@ -32,9 +32,8 @@ class MetricsEndpoint(override val httpPath: String = "metrics")(implicit system
   //Source.actorPublisher[ByteString](Props[JvmMetricsClient].withDispatcher(Dispatcher))
 
   override val route: Route =
-    (get & path(httpPath / Segment)) { id ⇒
+    (get & path(httpPath / "jvm")) {
       withUri { url ⇒
-        system.log.info(s"HTTP GET: [$url]")
         complete {
           HttpResponse(entity = HttpEntity.Chunked.fromData(ContentTypes.`text/plain(UTF-8)`, metricsSource))
         }

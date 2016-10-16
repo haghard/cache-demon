@@ -12,6 +12,8 @@ package object http {
     def lastUpdated: ZonedDateTime
   }
 
-  trait ReqParams
+  trait ReqParams {
+    def url: String
+  }
 
 }

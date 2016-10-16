@@ -17,8 +17,8 @@ object Cache {
   case class CacheException(message: String, cause: Throwable) extends Exception(message, cause)
 
   //Req
-  case class FindInDecompressed(id: Int) extends ReqParams
-  case class FindInIndex(id: Int) extends ReqParams
+  case class FindInDecompressed(override val url: String, id: Int) extends ReqParams
+  case class FindInIndex(override val url: String, id: Int) extends ReqParams
 
   //Resp
   case class CacheItem[T](value: Option[T] = None, lastUpdated: ZonedDateTime,
@@ -30,8 +30,6 @@ object Cache {
     override def compare(x: IndexEntry[String], y: IndexEntry[String]): Int = x.endPosition - y.endPosition
   }
 
-  val DispatcherName = "akka.cache-dispatcher"
-
   val nanoDivider = 1000
   val notFound = "empty"
   val notFoundEntry = IndexEntry(-1, "")
@@ -42,7 +40,7 @@ object Cache {
     tokenize(x).mkString
   }
 
-  def props(url: String, pref: String, pullInterval: FiniteDuration) = Props(new Cache(url, pref, pullInterval)).withDispatcher(DispatcherName)
+  def props(url: String, pref: String, pullInterval: FiniteDuration) = Props(new Cache(url, pref, pullInterval)).withDispatcher(Application.Dispatcher)
 }
 
 class Cache(override val url: String, override val pref: String, override val pullInterval: FiniteDuration) extends Actor
@@ -56,14 +54,13 @@ class Cache(override val url: String, override val pref: String, override val pu
       akka.stream.Supervision.Resume
     }
 
-  val settings = ActorMaterializerSettings
-    .create(system = context.system)
-    .withInputBuffer(1, 1)
-    .withSupervisionStrategy(clientFlowDecider)
-    .withDispatcher(Cache.DispatcherName)
-
   implicit val timeout = akka.util.Timeout(3 second)
-  implicit val mat = akka.stream.ActorMaterializer(settings)
+  implicit val mat = akka.stream.ActorMaterializer(
+    ActorMaterializerSettings
+      .create(system = context.system)
+      .withInputBuffer(1, 1)
+      .withSupervisionStrategy(clientFlowDecider)
+      .withDispatcher("akka.fetch-dispatcher"))
 
   override val clientFlow = Http(context.system).outgoingConnection(url)
 
@@ -73,11 +70,11 @@ class Cache(override val url: String, override val pref: String, override val pu
   private def outOffRange(index: Int, maxIndex: Int): Boolean = index < 0 || index > maxIndex
 
   def updateState(state: Seq[Compressed[String]], index: Vector[IndexEntry[String]], maxIndex: Int, lastUpdate: ZonedDateTime): Receive = {
-    case FindInIndex(index0) ⇒
+    case FindInIndex(url, index0) ⇒
       if (!outOffRange(index0, maxIndex)) {
         val start = System.nanoTime
 
-        //binary search is using since we have Vector
+        //binary search is used since we have Vector
         import scala.collection.Searching._
         val searchResult: SearchResult = index.search(IndexEntry(index0, ""))
 
@@ -91,7 +88,7 @@ class Cache(override val url: String, override val pref: String, override val pu
       }
 
     //a very naive way to search. Just decompress on each request
-    case FindInDecompressed(index0) ⇒
+    case FindInDecompressed(url, index0) ⇒
       if (!outOffRange(index0, maxIndex)) {
         val start = System.nanoTime
         val cache = Decompressor(state)
