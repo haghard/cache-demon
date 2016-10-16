@@ -45,7 +45,8 @@ trait Fetcher {
     (Source.single(HttpRequest(uri = pref)) via clientFlow).runWith(Sink.head)
       .flatMap { res ⇒
         res.status match {
-          case OK ⇒ res.entity.dataBytes.via(framing).map { line ⇒ line.utf8String }
+          case OK ⇒ res.entity.dataBytes.via(framing)
+            .map { line ⇒ line.utf8String }
             .runWith(Sink.seq[String])
           case other ⇒
             Future.failed(new Exception(s"Http error: $other"))

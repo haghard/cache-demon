@@ -33,13 +33,16 @@ class JvmMetrics extends ActorPublisher[ByteString] with ActorLogging {
     val snap = Jvm.snapCounters
     val vmArgs = snap(vmArgsKey)
     val vmName = snap(vmNameKey)
-    log.info("\n ★ ★ ★ ★ ★ ★ \nJvmArgs: {}\n{}\n ★ ★ ★ ★ ★ ★", vmName, vmArgs)
+    log.info("\n ★ ★ ★ ★ ★ ★ \nJvmArgs: {}\n{}\n {}\n★ ★ ★ ★ ★ ★", vmName, vmArgs,
+      org.openjdk.jol.vm.VM.current().details())
     val exp = "(.+)-XX:\\+Use(\\w+)GC(.+)".r
     gcName = vmArgs match {
       case exp(_, name, _) ⇒ Some(name)
       case _               ⇒ None
     }
   }
+
+
 
   override def receive: Receive = {
     case line: String ⇒

@@ -1,12 +1,12 @@
 package com
 
 import akka.actor.ActorRef
-import com.carjump.http.{ReqParams, CacheResponseBody}
-import scala.reflect.ClassTag
-import scala.util.control.NonFatal
 import akka.pattern.AskTimeoutException
+import com.carjump.http.{CacheResponseBody, ReqParams}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
+import scala.util.control.NonFatal
 
 package object carjump {
 
@@ -21,6 +21,7 @@ package object carjump {
 
 
   trait AskSupport {
+
     import akka.pattern.ask
 
     implicit def askTimeout: akka.util.Timeout
