@@ -47,35 +47,38 @@ class EnglishWordsCache(url: String) extends Actor with ActorLogging with Stash 
   import algebra.ring.AdditiveMonoid
   import algebra.instances.all._
 
-  override def receive: Receive = await(AdditiveMonoid[RadixTree[String, Long]])
+  override def receive = indexing(AdditiveMonoid[RadixTree[String, Long]])
 
   private def fetch: Future[HttpResponse] = {
     implicit val ex = mat.executionContext
     Http(context.system).singleRequest(HttpRequest(uri = url)).pipeTo(self)
   }
 
-  private def await(M: AdditiveMonoid[RadixTree[String, Long]]): Receive = {
+  val mbDivider = (1024 * 1024).toFloat
+
+  private def indexing(M: AdditiveMonoid[RadixTree[String, Long]]): Receive = {
     case HttpResponse(OK, headers, entity, _) ⇒
       implicit val ex = mat.executionContext
       val f: Future[TreeIndex] = (entity.dataBytes.via(framing).map { line ⇒ line.utf8String }
         .runWith(Sink.fold((0l, M.zero)) { (pair, word) ⇒
           val num = pair._1 + 1l
-          if (num % 10000 == 0) log.info("progress:{}", num)
+          if (num % 10000 == 0)
+            log.info("progress:{}", num)
           (num, M.plus(pair._2, RadixTree(word -> num)))
         })).map(_._2)
       f.pipeTo(self)
     case resp @ HttpResponse(code, _, _, _) ⇒
       log.info(s"Request failed with code: $code")
       resp.discardEntityBytes()
-      context.stop(self)
+      (context stop self)
     case tree: RadixTree[String, Long] @unchecked ⇒
-      val mbSize = org.openjdk.jol.info.GraphLayout.parseInstance(tree).totalSize().toFloat / (1024 * 1024).toFloat
+      val mbSize = org.openjdk.jol.info.GraphLayout.parseInstance(tree).totalSize().toFloat / mbDivider
       log.info("Tree the number of elements {} {} mb", tree.count, mbSize)
       unstashAll()
       context become ready(tree)
     case akka.actor.Status.Failure(ex) ⇒
       log.error(ex, "EnglishWordsCache has got error")
-      context.stop(self)
+      (context stop self)
 
     case _ ⇒ stash()
   }
