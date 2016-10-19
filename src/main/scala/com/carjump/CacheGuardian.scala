@@ -28,7 +28,7 @@ class CacheGuardian extends Actor with ActorLogging {
   }
 
   val props = BackoffSupervisor.props(
-    Backoff.onStop(childProps = Cache.props(url, pref, pullInterval), childName = "fetcher",
+    Backoff.onStop(childProps = Cache.props(url, pref, pullInterval), childName = "cache",
       minBackoff = minBackoffInterval, maxBackoff = maxBackoffInterval, randomFactor = 0.2)
       .withSupervisorStrategy(OneForOneStrategy()(decider.orElse(SupervisorStrategy.defaultStrategy.decider))))
 
