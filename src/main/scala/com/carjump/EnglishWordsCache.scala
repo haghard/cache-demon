@@ -14,8 +14,17 @@ import akka.pattern.pipe
 import com.rklaehn.radixtree._
 import cats.implicits._
 
+/**
+ *
+ * A very simple example where a RadixTree is very useful is word completion from a very large dictionary.
+ * Filtering by prefix is extremely fast with a radix tree (worst case O(log(N)),
+ * whereas it is worse than O(N) with SortedMap and HashMap.
+ * Filtering by prefix will also benefit a lot from structural sharing.
+ *
+ */
 object EnglishWordsCache {
-  type TreeIndex = RadixTree[String, Long]
+  type Index = RadixTree[String, Long]
+  val mbDivider = (1024 * 1024).toFloat
 
   case class SearchByPrefix(override val url: String, prefix: String) extends ReqParams
 
@@ -54,12 +63,10 @@ class EnglishWordsCache(url: String) extends Actor with ActorLogging with Stash 
     Http(context.system).singleRequest(HttpRequest(uri = url)).pipeTo(self)
   }
 
-  val mbDivider = (1024 * 1024).toFloat
-
   private def indexing(M: AdditiveMonoid[RadixTree[String, Long]]): Receive = {
     case HttpResponse(OK, headers, entity, _) ⇒
       implicit val ex = mat.executionContext
-      val f: Future[TreeIndex] = (entity.dataBytes.via(framing).map { line ⇒ line.utf8String }
+      val f: Future[Index] = (entity.dataBytes.via(framing).map { line ⇒ line.utf8String }
         .runWith(Sink.fold((0l, M.zero)) { (pair, word) ⇒
           val num = pair._1 + 1l
           if (num % 10000 == 0)

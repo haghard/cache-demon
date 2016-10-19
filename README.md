@@ -34,9 +34,24 @@ cache-demon
 
 `http GET localhost:9000/index/{id}`
 
-`http GET localhost:9000/metrics/jvm`
+`curl --no-buffer localhost:9000/metrics/jvm`
 
 `http GET localhost:9000/words/deliver`
 
 
 One thing to notice being that the index starts with 0. If the cache size is 999, the index can be queried in 0-998
+
+#### Radixtree ####
+ 
+  https://github.com/rklaehn/radixtree
+
+#### GC links ####
+  
+  https://dzone.com/articles/5-coding-hacks-reduce-gc
+  
+  https://plumbr.eu/handbook/gc-tuning
+  
+  http://techblog.netflix.com/2013/05/garbage-collection-visualization.html
+
+
+￼￼

@@ -75,7 +75,7 @@ class JvmMetrics extends ActorPublisher[ByteString] with ActorLogging {
       val line = new StringBuilder().append(s"Process:${id.get}").append("\n")
         .append(s"Heap: Max:$heapMaxSize mb Size:$heapSize mb Used:${heapSize - heapFreeSize} mb ")
         .append(s"Allocated total:${mb} mb ").append("\n")
-        .append("Metaspace: ").append(s"$metasp").append("\n").append(s"GC:$gcName")
+        .append("Metaspace: ").append(s"$metasp").append("\n").append(s"GC:${gcName.getOrElse("Unknown")}")
         .append("\n").append(s"$gcs").append("\n").append(s"$gcsHisto").append("\n\n").toString()
 
       akka.pattern.after(pushTimeout, context.system.scheduler)(self.ask(line))
