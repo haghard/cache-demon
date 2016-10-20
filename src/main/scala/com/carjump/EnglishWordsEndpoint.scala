@@ -3,7 +3,7 @@ package com.carjump
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, StatusCodes, HttpResponse }
 import akka.util.ByteString
-import com.carjump.EnglishWordsCache.SearchByPrefix
+import com.carjump.EnglishWordsByPrefix.SearchByPrefix
 import com.carjump.http.HttpSupport
 
 import scala.concurrent.ExecutionContext

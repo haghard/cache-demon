@@ -22,13 +22,13 @@ object Application extends App {
       .withInputBuffer(32, 64)
       .withDispatcher(Dispatcher))
 
-  val fetcher = system.actorOf(CacheGuardian.props, "guardian")
+  val guardian = system.actorOf(CacheGuardian.props, "guardian")
 
   val metrics = new MetricsEndpoint()
-  val index = new IndexEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
-  val cache = new CacheEndpoint(fetcher, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
+  val index = new IndexEndpoint(guardian, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
+  val cache = new CacheEndpoint(guardian, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
 
-  val wordsCache = system.actorOf(EnglishWordsCache.props(cfg.getString("words.url")))
+  val wordsCache = system.actorOf(EnglishWordsByPrefix.props(cfg.getString("words.url")))
 
   val words = new EnglishWordsEndpoint(wordsCache, askTimeout = akka.util.Timeout(cfg.getDuration("ask-cache.time-out")))
 
@@ -52,7 +52,7 @@ object Application extends App {
           .append('\n')
         system.log.info(greeting.toString)
       case Failure(ex) ⇒
-        system.log.error(ex, s"Could'n start http server on $httpPort")
+        system.log.error(ex, s"Couldn't start http server on $httpPort")
         sys.exit(-1)
     }
 }

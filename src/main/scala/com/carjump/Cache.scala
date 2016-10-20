@@ -78,7 +78,7 @@ class Cache(override val url: String, override val pref: String, override val pu
     case FindInIndex(url, index0) ⇒
       if (!outOffRange(index0, maxIndex)) {
         val start = System.nanoTime
-        //binary search is used since we have Vector
+        //binary search is used because of Vector
         import scala.collection.Searching._
 
         val searchResult: SearchResult = inMemoryIndex.search(IndexEntry(index0, ""))

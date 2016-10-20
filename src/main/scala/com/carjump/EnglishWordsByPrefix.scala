@@ -22,18 +22,18 @@ import cats.implicits._
  * Filtering by prefix will also benefit a lot from structural sharing.
  *
  */
-object EnglishWordsCache {
+object EnglishWordsByPrefix {
   type Index = RadixTree[String, Long]
   val mbDivider = (1024 * 1024).toFloat
 
   case class SearchByPrefix(override val url: String, prefix: String) extends ReqParams
 
   def props(url: String) =
-    Props(new EnglishWordsCache(url)).withDispatcher(Application.Dispatcher)
+    Props(new EnglishWordsByPrefix(url)).withDispatcher(Application.Dispatcher)
 }
 
-class EnglishWordsCache(url: String) extends Actor with ActorLogging with Stash {
-  import EnglishWordsCache._
+class EnglishWordsByPrefix(url: String) extends Actor with ActorLogging with Stash {
+  import EnglishWordsByPrefix._
   val sep = ByteString("\n")
   val framing = Framing.delimiter(sep, maximumFrameLength = 100, allowTruncation = true)
 
@@ -82,7 +82,7 @@ class EnglishWordsCache(url: String) extends Actor with ActorLogging with Stash 
       val mbSize = org.openjdk.jol.info.GraphLayout.parseInstance(tree).totalSize().toFloat / mbDivider
       log.info("Tree the number of elements {} {} mb", tree.count, mbSize)
       unstashAll()
-      context become ready(tree)
+      context become active(tree)
     case akka.actor.Status.Failure(ex) ⇒
       log.error(ex, "EnglishWordsCache has got error")
       (context stop self)
@@ -90,7 +90,7 @@ class EnglishWordsCache(url: String) extends Actor with ActorLogging with Stash 
     case _ ⇒ stash()
   }
 
-  private def ready(tree: RadixTree[String, Long]): Receive = {
+  private def active(tree: RadixTree[String, Long]): Receive = {
     case SearchByPrefix(url, pref) ⇒
       val results = tree.filterPrefix(pref).keys
       log.info("Result size: {}", results.size)
