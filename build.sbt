@@ -50,6 +50,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi"         %%  "pprint"                  %   "0.4.1",
   "org.openjdk.jol"     %   "jol-core"                %   "0.6",
   "org.typelevel"       %%  "cats-core"               %   "0.7.2",
+  "io.spray"            %% "spray-json"               %   "1.3.2",
   "com.rklaehn"         %%  "radixtree"               %   "0.3.0", //local build
   "ch.qos.logback"      %   "logback-classic"         %   "1.1.2"
 )

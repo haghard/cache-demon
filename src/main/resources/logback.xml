@@ -1,4 +1,5 @@
 <configuration>
+
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%X{sourceThread}] %-5level %logger{36} %X{akkaSource} – %msg%n</pattern>
@@ -6,7 +7,7 @@
     </appender>
 
     <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>carjump.log</file>
+        <file>${log-file:-application.log}</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%X{sourceThread}] %-5level %logger{36} %X{akkaSource} – %msg%n</pattern>
         </encoder>
@@ -22,13 +23,9 @@
         <appender-ref ref="console" />
     </appender>
 
-
-    <logger name="Remoting" level="off" additivity="false"></logger>
-
-    <logger name="akka.remote.EndpointWriter" level="off" additivity="false"></logger>
-
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="asyncConsole"/>
         <appender-ref ref="asyncFile"/>
     </root>
+
 </configuration>

@@ -1,5 +1,7 @@
 package com.carjump
 
+import java.time.ZonedDateTime
+
 import akka.actor.{ Stash, Props, Actor, ActorLogging }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
@@ -7,7 +9,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.stream.{ Supervision, ActorMaterializerSettings }
 import akka.stream.scaladsl.{ Framing, Sink }
 import akka.util.ByteString
-import com.carjump.http.ReqParams
+import com.carjump.http.{ CacheResponseBody, ReqParams }
 import com.rklaehn.radixtree.RadixTree
 import scala.concurrent.Future
 import akka.pattern.pipe
@@ -27,6 +29,9 @@ object EnglishWordsByPrefix {
   val mbDivider = (1024 * 1024).toFloat
 
   case class SearchByPrefix(override val url: String, prefix: String) extends ReqParams
+
+  case class SearchResult(words: Vector[String], latency: Long = 0l,
+                          error: Option[String] = None, lastUpdated: ZonedDateTime) extends CacheResponseBody
 
   def props(url: String) =
     Props(new EnglishWordsByPrefix(url)).withDispatcher(Application.Dispatcher)
@@ -82,7 +87,7 @@ class EnglishWordsByPrefix(url: String) extends Actor with ActorLogging with Sta
       val mbSize = org.openjdk.jol.info.GraphLayout.parseInstance(tree).totalSize().toFloat / mbDivider
       log.info("Tree the number of elements {} {} mb", tree.count, mbSize)
       unstashAll()
-      context become active(tree)
+      context become active(tree, ZonedDateTime.now)
     case akka.actor.Status.Failure(ex) ⇒
       log.error(ex, "EnglishWordsCache has got error")
       (context stop self)
@@ -90,10 +95,13 @@ class EnglishWordsByPrefix(url: String) extends Actor with ActorLogging with Sta
     case _ ⇒ stash()
   }
 
-  private def active(tree: RadixTree[String, Long]): Receive = {
+  val nanoDivider = 1000
+
+  private def active(tree: RadixTree[String, Long], time: ZonedDateTime): Receive = {
     case SearchByPrefix(url, pref) ⇒
+      val start = System.nanoTime
       val results = tree.filterPrefix(pref).keys
       log.info("Result size: {}", results.size)
-      log.info(results.mkString("\n"))
+      sender() ! SearchResult(results.toVector, (System.nanoTime - start) / nanoDivider, None, time)
   }
 }

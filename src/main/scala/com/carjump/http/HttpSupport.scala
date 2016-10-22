@@ -29,4 +29,7 @@ trait HttpSupport extends Directives {
   def success(resp: String, hs: scala.collection.immutable.Seq[HttpHeader]) =
     HttpResponse(StatusCodes.OK, hs, HttpEntity(ContentTypes.`text/plain(UTF-8)`, ByteString(resp)))
 
+  def successJson(resp: String, hs: scala.collection.immutable.Seq[HttpHeader]) =
+    HttpResponse(StatusCodes.OK, hs, HttpEntity(ContentTypes.`application/json`, ByteString(resp)))
+
 }
