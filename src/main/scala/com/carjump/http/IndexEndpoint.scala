@@ -16,8 +16,12 @@ class IndexEndpoint(cache: ActorRef,
 
   override val route = (get & path(httpPath / Segment)) { id ⇒
     withUri { url ⇒
-      system.log.info(s"HTTP GET: $url")
-      get(complete(query(id, url)))
+      get {
+        complete {
+          system.log.info(s"HTTP GET: $url")
+          query(id, url)
+        }
+      }
     }
   }
 
