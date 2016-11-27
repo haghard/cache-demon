@@ -1,6 +1,6 @@
 package com.carsharing
 
-import cats.data.Xor
+import cats.data.Ior
 import akka.http.scaladsl.model._
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.model.headers.RawHeader
@@ -27,10 +27,10 @@ class EnglishWordsEndpoint(wordsIndex: ActorRef, override val httpPath: String =
   import DefaultJsonProtocol._
   private def query(url: String, pref: String): Future[HttpResponse] = {
     queryCache[SearchResult](SearchByPrefix(url, pref), wordsIndex).map {
-      case Xor.Right(res) ⇒
+      case Ior.Right(res) ⇒
         successJson(res.words.toJson.prettyPrint,
           immutable.Seq[HttpHeader](RawHeader(latencyHeader, res.latency.toString), RawHeader(timeHeader, formatter.format(res.lastUpdated))))
-      case Xor.Left(ex) ⇒ internalError(ex)
+      case Ior.Left(ex) ⇒ internalError(ex)
     }
   }
 }

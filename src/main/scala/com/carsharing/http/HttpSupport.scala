@@ -32,4 +32,11 @@ trait HttpSupport extends Directives {
   def successJson(resp: String, hs: scala.collection.immutable.Seq[HttpHeader]) =
     HttpResponse(StatusCodes.OK, hs, HttpEntity(ContentTypes.`application/json`, ByteString(resp)))
 
+  def parseId(id: String): Either[NumberFormatException, Int] =
+    try {
+      Right(id.toInt)
+    } catch {
+      case nfe: NumberFormatException ⇒ Left(nfe)
+    }
+
 }

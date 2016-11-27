@@ -25,17 +25,17 @@ package object carsharing {
 
     implicit def askTimeout: akka.util.Timeout
 
-    def queryCache[T <: CacheResponseBody](message: ReqParams, cache: ActorRef)(implicit ec: ExecutionContext, tag: ClassTag[T]): Future[cats.data.Xor[String, T]] =
+    def queryCache[T <: CacheResponseBody](message: ReqParams, cache: ActorRef)(implicit ec: ExecutionContext, tag: ClassTag[T]): Future[cats.data.Ior[String, T]] =
       cache.ask(message).mapTo[T].map { response =>
-        response.error.fold(cats.data.Xor.right(response)) { error =>
+        response.error.fold(cats.data.Ior.right(response)) { error =>
           throw ValidationException(error)
         }
       }.recoverWith {
-        case ex: ClassCastException ⇒ Future.successful(cats.data.Xor.left(s"Could'n cast type: ${ex.getMessage}"))
-        case ex: AskTimeoutException ⇒ Future.successful(cats.data.Xor.left(s"Request timeout: ${ex.getMessage}"))
-        case ex: ValidationException => Future.successful(cats.data.Xor.left(s"Validation error: ${ex.getMessage}"))
+        case ex: ClassCastException ⇒ Future.successful(cats.data.Ior.left(s"Could'n cast type: ${ex.getMessage}"))
+        case ex: AskTimeoutException ⇒ Future.successful(cats.data.Ior.left(s"Request timeout: ${ex.getMessage}"))
+        case ex: ValidationException => Future.successful(cats.data.Ior.left(s"Validation error: ${ex.getMessage}"))
         case NonFatal(e) => //Doesn't swallow stack overflow and out of memory errors
-          Future.successful(cats.data.Xor.left(s"Unexpected error: ${e.getMessage}"))
+          Future.successful(cats.data.Ior.left(s"Unexpected error: ${e.getMessage}"))
       }
   }
 }
