@@ -2,7 +2,7 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 import NativePackagerKeys._
 
-organization := "com.carjump"
+organization := "com.haghard"
 
 name := "cache-demon"
 
@@ -45,19 +45,19 @@ resolvers ++= Seq("maven central"  at "http://repo.maven.apache.org/maven2")
 libraryDependencies ++= Seq(
   "net.ceedubs"         %%  "ficus"                   %   "1.1.2", //config
   "com.typesafe.akka"   %%  "akka-stream"             %   Akka,
-  "com.typesafe.akka"   %%  "akka-http"               %   AkkaHttp,
   "com.typesafe.akka"   %%  "akka-slf4j"              %   Akka,
-  "com.twitter"         %%  "util-jvm"                %   "6.38.0",
-  "com.lihaoyi"         %%  "pprint"                  %   "0.4.1",
+  "com.typesafe.akka"   %%  "akka-http"               %   AkkaHttp,
+  "com.typesafe.akka"   %%  "akka-http-spray-json"    %   AkkaHttp,
+  "com.twitter"         %%  "util-jvm"                %   "6.39.0",
+  "com.lihaoyi"         %%  "pprint"                  %   "0.4.3",
   "org.openjdk.jol"     %   "jol-core"                %   "0.6",
-  "org.typelevel"       %%  "cats-core"               %   "0.8.1",
-  "io.spray"            %% "spray-json"               %   "1.3.2",
-  "com.rklaehn"         %%  "radixtree"               %   "0.3.0", //local build
+  "org.typelevel"       %%  "cats-core"               %   "0.8.0",
+  "com.rklaehn"         %%  "radixtree"               %   "0.4.0",
   "ch.qos.logback"      %   "logback-classic"         %   "1.1.2"
 )
 
 libraryDependencies ++= Seq(
-  "org.scalatest"     %%  "scalatest"         %   "2.2.5"   % "test",
+  "org.scalatest"     %%  "scalatest"         %   "3.0.1"   % "test",
   "com.typesafe.akka" %%  "akka-testkit"      %   Akka      % "test"
 )
 

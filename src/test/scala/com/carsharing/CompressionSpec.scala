@@ -27,7 +27,7 @@ class CompressionSpec extends WordSpecLike with MustMatchers {
     "handle strings 0" in {
       val actual = Vector("aaa", "aaa", "aaa")
       val r = Compressor(actual)
-      actual.mustBe(Decompressor(r))
+      actual mustBe Decompressor(r)
     }
 
     "handle strings 1" in {
