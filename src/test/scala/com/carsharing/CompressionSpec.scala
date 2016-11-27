@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-package com.carjump
+package com.carsharing
 
-import com.carjump.compression.{ Compressor, Decompressor }
+import com.carsharing.compression.{ Compressor, Decompressor }
 import org.scalatest.{ MustMatchers, WordSpecLike }
 
 import scala.collection.IndexedSeqLike

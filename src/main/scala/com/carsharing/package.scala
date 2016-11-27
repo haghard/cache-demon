@@ -1,14 +1,14 @@
 package com
 
 import akka.actor.ActorRef
-import com.carjump.http.{ReqParams, CacheResponseBody}
+import com.carsharing.http.{ReqParams, CacheResponseBody}
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import akka.pattern.AskTimeoutException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-package object carjump {
+package object carsharing {
 
   implicit def funcToRunnable(f: () ⇒ Unit) = new Runnable {
     override def run() = f()

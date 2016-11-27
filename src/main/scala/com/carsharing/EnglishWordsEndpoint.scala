@@ -1,11 +1,11 @@
-package com.carjump
+package com.carsharing
 
 import cats.data.Xor
 import akka.http.scaladsl.model._
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.model.headers.RawHeader
-import com.carjump.EnglishWordsByPrefix.{ SearchByPrefix, SearchResult }
-import com.carjump.http.HttpSupport
+import com.carsharing.EnglishWordsByPrefix.{ SearchByPrefix, SearchResult }
+import com.carsharing.http.HttpSupport
 
 import scala.collection.immutable
 import scala.concurrent.{ ExecutionContext, Future }

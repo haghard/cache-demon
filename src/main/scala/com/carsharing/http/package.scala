@@ -1,4 +1,4 @@
-package com.carjump
+package com.carsharing
 
 import java.time.ZonedDateTime
 

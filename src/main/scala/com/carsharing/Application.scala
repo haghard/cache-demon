@@ -1,11 +1,11 @@
-package com.carjump
+package com.carsharing
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializerSettings
 import com.typesafe.config.ConfigFactory
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.carjump.http.{ MetricsEndpoint, CacheEndpoint, IndexEndpoint }
+import com.carsharing.http.{ MetricsEndpoint, CacheEndpoint, IndexEndpoint }
 
 import scala.util.{ Failure, Success }
 

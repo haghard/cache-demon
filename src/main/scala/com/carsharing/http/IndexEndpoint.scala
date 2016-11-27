@@ -1,11 +1,11 @@
-package com.carjump.http
+package com.carsharing.http
 
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ HttpHeader, HttpResponse }
 import cats.data.Xor
-import com.carjump.AskSupport
-import com.carjump.Cache.{ CacheItem, FindInIndex }
+import com.carsharing.AskSupport
+import com.carsharing.Cache.{ CacheItem, FindInIndex }
 
 import scala.collection.immutable
 import scala.concurrent.{ ExecutionContext, Future }

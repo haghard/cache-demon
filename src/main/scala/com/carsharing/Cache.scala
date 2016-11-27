@@ -1,10 +1,10 @@
-package com.carjump
+package com.carsharing
 
 import java.time._
 
 import akka.http.scaladsl.Http
-import com.carjump.compression._
-import com.carjump.http.{ CacheResponseBody, ReqParams }
+import com.carsharing.compression._
+import com.carsharing.http.{ CacheResponseBody, ReqParams }
 import com.rklaehn.radixtree.RadixTree
 import scala.collection.immutable.SortedMap
 import scala.concurrent.duration._

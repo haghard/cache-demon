@@ -1,7 +1,7 @@
-package com.carjump
+package com.carsharing
 
 import akka.actor._
-import com.carjump.http.ReqParams
+import com.carsharing.http.ReqParams
 import net.ceedubs.ficus.Ficus._
 import scala.concurrent.duration._
 import akka.actor.SupervisorStrategy.Directive

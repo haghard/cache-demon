@@ -1,4 +1,4 @@
-package com.carjump.http
+package com.carsharing.http
 
 import akka.actor.{ ActorSystem, Props }
 import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse }

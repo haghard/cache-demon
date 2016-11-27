@@ -1,4 +1,4 @@
-package com.carjump
+package com.carsharing
 
 import akka.stream.Materializer
 import akka.actor.{ ActorRef, Cancellable, Actor, ActorLogging }

@@ -10,7 +10,8 @@ version := "0.0.1"
 
 scalaVersion := "2.11.8"
 
-val Akka = "2.4.11"
+val Akka = "2.4.14"
+val AkkaHttp = "10.0.0"
 
 scalacOptions ++= Seq(
   "-feature",
@@ -28,7 +29,7 @@ useJGit
 enablePlugins(GitVersioning)
 enablePlugins(JavaAppPackaging)
 
-mainClass in Compile := Some("com.carjump.Application")
+mainClass in Compile := Some("com.carsharing.Application")
 
 scalariformSettings
 
@@ -44,7 +45,7 @@ resolvers ++= Seq("maven central"  at "http://repo.maven.apache.org/maven2")
 libraryDependencies ++= Seq(
   "net.ceedubs"         %%  "ficus"                   %   "1.1.2", //config
   "com.typesafe.akka"   %%  "akka-stream"             %   Akka,
-  "com.typesafe.akka"   %%  "akka-http-experimental"  %   Akka,
+  "com.typesafe.akka"   %%  "akka-http"               %   AkkaHttp,
   "com.typesafe.akka"   %%  "akka-slf4j"              %   Akka,
   "com.twitter"         %%  "util-jvm"                %   "6.38.0",
   "com.lihaoyi"         %%  "pprint"                  %   "0.4.1",

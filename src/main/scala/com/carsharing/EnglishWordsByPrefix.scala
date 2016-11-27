@@ -1,4 +1,4 @@
-package com.carjump
+package com.carsharing
 
 import java.time.ZonedDateTime
 
@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.stream.{ Supervision, ActorMaterializerSettings }
 import akka.stream.scaladsl.{ Framing, Sink }
 import akka.util.ByteString
-import com.carjump.http.{ CacheResponseBody, ReqParams }
+import com.carsharing.http.{ CacheResponseBody, ReqParams }
 import com.rklaehn.radixtree.RadixTree
 import scala.concurrent.Future
 import akka.pattern.pipe
